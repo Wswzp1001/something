@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 禁止拖动 -->
+<!-- ondragstart="return false" -->
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>3D旋转相册</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: #000;
+        }
+        
+        #perspective {
+            perspective: 5000px;
+            /* 景深(场景深度，场景离屏幕的距离)  立体的*/
+            cursor: pointer;
+        }
+        
+        #wrap {
+            position: relative;
+            width: 200px;
+            height: 120px;
+            margin: 200px auto;
+            /* border: 1px solid #f00; */
+            transform-style: preserve-3d;
+            /* 3D的属性赋予 元素会被3D属性修饰 */
+            transform: rotateX(-10deg) rotateY(0deg);
+        }
+        
+        img {
+            position: absolute;
+            width: 200px;
+            height: 120px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="perspective">
+        <div id="wrap">
+            <img src="images/阿狸.jpg" alt="">
+            <img src="images/亚索.jpg" alt="">
+            <img src="images/德莱厄斯.jpg" alt="">
+            <img src="images/奉先.jpg" alt="">
+            <img src="images/贾克斯.png" alt="">
+            <img src="images/剑圣.jpg" alt="">
+            <img src="images/金克斯.jpg" alt="">
+            <img src="images/卢锡安.jpg" alt="">
+        </div>
+    </div>
+</body>
+<script>
+    var oImg = document.getElementsByTagName('img');
+    var deg = 360 / oImg.length;
+    window.onload = function() {
+        // 页面加载之后执行，就会有一个时间差
+        // 圆的单位度数
+        // 这里不用for循环的问题在于。避免局部冲突，命名污染的问题。 
+        [].map.call(oImg, function(arg1, arg2) {
+            // console.log(arg1, arg2);
+            // 第一个属性是图片,第二个属性是索引
+
+            arg1.style.transform = "rotateY(" + arg2 * deg + "deg) translateZ(280px)";
+            arg1.style.transition = " 1s " + (oImg.length - arg2) * .1 + "s ";
+            // 要有一个先后顺序，不是同时渐变
+            // 如何设置时间先后顺序，设置时间越来越快,即时间越来越小，需要一个越来越大的值(arg2)
+            // transition属性有个改变的过程，在页面加载完之后才会改变,时间差
+        })
+    }
+
+    // 拖拽分为三步：
+    // 拖拽的逻辑：记录鼠标轨迹，鼠标的位置  event.clientX/clientY
+    // 每两次移动的鼠标位置差就是相册移动的距离
+
+    // 两次移动的鼠标位置
+
+    // 新的鼠标位置(每移动一次，就会产生一个新的)-旧的位置 
+    var newX, newY, prevX, prevY, minusX, minusY, rotX = -10,
+        rotY = 0;
+    var oWrap = document.getElementById('wrap');
+    // 点下去
+    document.onmousedown = function(e) {
+        prevX = e.clientX;
+        prevY = e.clientY;
+
+        // 移动
+        this.onmousemove = function(e) {
+                newX = e.clientX;
+                newY = e.clientY;
+                minusX = newX - prevX;
+                minusY = newY - prevY;
+                // 把差值转换为旋转的度数并赋值给相册
+                rotX -= minusY * .1;
+                rotY += minusX * .1;
+                prevX = newX;
+                prevY = newY;
+                oWrap.style.transform = "rotateX(" + rotX + "deg) rotateY(" + rotY + "deg)";
+
+
+            }
+            // 松开
+        this.onmouseup = function() {
+            this.onmousemove = null;
+        }
+    }
+</script>
+
+</html>
